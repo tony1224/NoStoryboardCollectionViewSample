@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UICollectionViewDataSource {
+class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
     var collectionView: UICollectionView!
     
@@ -32,16 +32,23 @@ class ViewController: UIViewController, UICollectionViewDataSource {
         let flowLayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         // 縦か横か
         flowLayout.scrollDirection = .vertical
+        
+        // NOTE: SBでいう MinSpacingのFor Cells:0がこれ
         // 余白設定の1つ。列間の余白の最小値を指定
-        flowLayout.minimumInteritemSpacing = 5.0
+        flowLayout.minimumInteritemSpacing = 3.0
+        
+        // NOTE: SBでいう MinSpacingのFor Lines:1 がこれ
         // 余白設定の1つ。行間の余白の値を設定
-        flowLayout.minimumLineSpacing = 5.0
+        flowLayout.minimumLineSpacing = 3.0
+        
         // NOTE: これをすると動的な変更は行えないので注意
-        flowLayout.itemSize = CGSize(width: 100, height: 100)
+//        flowLayout.itemSize = CGSize(width: 100, height: 100)
         
         collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: flowLayout)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
         collectionView.dataSource = self
+        // sizeForItemAtを呼ぶにはこの指定が必要
+        collectionView.delegate = self
         self.view.addSubview(collectionView)
         
         setupCollectionConstrains()
@@ -67,6 +74,15 @@ class ViewController: UIViewController, UICollectionViewDataSource {
         let cell: UICollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
         cell.backgroundColor = UIColor.red
         return cell
+    }
+    
+    // UICollectionViewDelegateFlowLayout
+    // サイズが大きいと列が1列になるので、StoryboardのSizeInspectorのMin Spacingで
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let cellSize: CGFloat = self.view.bounds.width/2 - 2
+        // 正方形で返すためにwidth,heightを同じにする
+        return CGSize(width: cellSize, height: cellSize)
     }
     
 }
